@@ -63,7 +63,7 @@ export default function Amazon(props) {
 
   return (
     <div className='container'>
-      <h1 className='text-center'>Amazon Configuration</h1>
+      <h1 className='text-center'>AmazonSES Configuration</h1>
       <form onSubmit={handleSubmit}>
       <div className='form-group'>
           <label htmlFor='tenantname'>Select Tenant</label>

@@ -8,7 +8,7 @@ export default function Vendor() {
 
   return (
     <div className='container'>
-      <h1 className='text-center'>Choose your provider</h1>
+      <h1 className='text-center'>Vendor Integrations</h1>
       <div className='text-center'>
         <Link to='/amazon' className='btn btn-secondary provider-link my-4 amazon' style={{width:"160px",height:"60px"}}>Amazon SES</Link>
         <br></br>
