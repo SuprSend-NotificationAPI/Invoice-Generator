@@ -22,7 +22,6 @@ export default function Sendgrid(props) {
   const apisuprsend = process.env.REACT_APP_API;
   const handleSubmit = async(event) => {
     event.preventDefault();
-    console.log('Form Data:', formdata);
     const response = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor/`,{
       method : "POST",
       headers:{
@@ -46,6 +45,40 @@ export default function Sendgrid(props) {
       )
     })
     const json = await response.json();
+    const response1 = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor_routing/email/_/transactional/`,{
+      method : "POST",
+      headers:{
+        Authorization: `Bearer ${apisuprsend}`,
+        'Content-Type':"application/json",
+      },
+      body : JSON.stringify(
+        {
+          "routes": [
+            {
+              "fallbacks": [
+                {
+                  "tenant_vendor_id": json.id 
+                }
+                ]
+            }
+            ]
+          }
+      )
+    })
+    const json1 = await response1.json();
+    const response2 = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor_routing/email/_/transactional/override/`,{
+      method : "POST",
+      headers:{
+        Authorization: `Bearer ${apisuprsend}`,
+        'Content-Type':"application/json",
+      },
+      body : JSON.stringify(
+        {
+          "override": true
+        }
+      )
+    })
+    const json2 = await response2.json();
     props.showAlert("Sendgrid vendor added to your Tenant succesfully","success");
   };
 
@@ -90,18 +123,6 @@ export default function Sendgrid(props) {
           />
         </div>
         <div className='form-group'>
-          <label htmlFor='fromName'>From Name</label>
-          <input
-            type='text'
-            id='fromName'
-            name='fromName'
-            className='form-control'
-            value={formdata.fromName}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
           <label htmlFor='fromEmail'>From Email</label>
           <input
             type='email'
@@ -109,31 +130,6 @@ export default function Sendgrid(props) {
             name='fromEmail'
             className='form-control'
             value={formdata.fromEmail}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='ReplyMail'>Reply Mail</label>
-          <input
-            type='email'
-            id='ReplyMail'
-            name='ReplyMail'
-            className='form-control'
-            value={formdata.ReplyMail}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='price'>Price</label>
-          <input
-            type='number'
-            id='price'
-            name='price'
-            step='0.001'
-            className='form-control'
-            value={formdata.price}
             onChange={handleInputChange}
             required
           />

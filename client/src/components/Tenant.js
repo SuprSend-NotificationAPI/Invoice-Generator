@@ -10,7 +10,10 @@ export default function Tenant(props) {
     primaryColor:"#FFFFFF",
     secondaryColor:"#FFFFFF",
     tertiaryColor:"#FFFFFF",
-    company_name:"",
+    facebook:"",
+    twitter:"",
+    linkedin:"",
+    medium:""
   });
  
   const handleChange = (event) => {
@@ -72,10 +75,32 @@ export default function Tenant(props) {
             </div>
           </div>
         </div>
+
+        {/* Social media handles :- */}
+
         <div className="form-group">
-          <label htmlFor="company_name">Social Media Handle name</label>
-          <input type="text" id="company_name" placeholder="suprsend" name="company_name" required onChange={handleChange} value={formData.company_name}/>
+          <label htmlFor="facebook">Facebook Link</label>
+          <input type="text" id="facebook"  name="facebook" required onChange={handleChange} value={formData.facebook}/>
         </div>
+
+
+        <div className="form-group">
+          <label htmlFor="twitter">Twitter Link</label>
+          <input type="text" id="twitter"  name="twitter" required onChange={handleChange} value={formData.twitter}/>
+        </div>
+
+
+        <div className="form-group">
+          <label htmlFor="linkedin">Linkedin Link</label>
+          <input type="text" id="linkedin"  name="linkedin" required onChange={handleChange} value={formData.linkedin}/>
+        </div>
+
+
+        <div className="form-group">
+          <label htmlFor="medium">Medium Link</label>
+          <input type="text" id="medium"  name="medium" required onChange={handleChange} value={formData.medium}/>
+        </div>
+       
         <button type="submit" className='btn btn-secondary mx-1'>Submit</button>
       </form>
     </div>

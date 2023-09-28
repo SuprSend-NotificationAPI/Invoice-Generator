@@ -20,33 +20,38 @@ app.get("/",function(req, res){
 
 /****************************************** Adding Tenants to suprsend ***************************************/
 
-app.post("/AddTenants",function(req,res){
-    const {brand_id,brand_name,logo_url,website,company_name,primaryColor,secondaryColor,tertiaryColor} = req.body;
-    console.log(brand_id,brand_name,logo_url,website,company_name,primaryColor,secondaryColor,tertiaryColor)
-    brand_payload = {
-      "brand_id": brand_id,
-      "brand_name": brand_name,
-      "logo": logo_url,
-      "primary_color": primaryColor,
-      "secondary_color": secondaryColor,
-      "tertiary_color": tertiaryColor,
-      "social_links": {
-        "website": website,
-        "facebook": "https://www.facebook.com/"+company_name,
-        "linkedin": "https://in.linkedin.com/company/"+company_name,
-        "twitter": "https://twitter.com/"+company_name,
-        "instagram": "https://www.instagram.com/"+company_name,
-      },
-      "properties": {
-        "prop1": "value1",
-        "prop2": "value2"
-      }
-     }   
-  
-    const response = supr_client.brands.upsert(brand_id, brand_payload); 
-    response.then((res) => console.log("response", res));
-    const success = true;
-    res.json({success});
+app.post("/AddTenants",async function(req,res){
+   try{
+     const {brand_id,brand_name,logo_url,website,facebook,linkedin,twitter,medium,primaryColor,secondaryColor,tertiaryColor} = req.body;
+     brand_payload = {
+       "brand_id": brand_id,
+       "brand_name": brand_name,
+       "logo": logo_url,
+       "primary_color": primaryColor,
+       "secondary_color": secondaryColor,
+       "tertiary_color": tertiaryColor,
+       "social_links": {
+         "website": website,
+         "facebook": facebook,
+         "linkedin": linkedin,
+         "twitter": twitter,
+         "medium": medium,
+       },
+       "properties": {
+         "prop1": "value1",
+         "prop2": "value2"
+       }
+      }   
+   
+     const response = await supr_client.brands.upsert(brand_id, brand_payload); 
+     console.log(response);
+     const success = true;
+     res.json({success});
+   }
+   catch{
+    console.error(`Error occured while adding tenant`);
+    return res.status(500).send("some error occurred");
+   }
   })
   
 

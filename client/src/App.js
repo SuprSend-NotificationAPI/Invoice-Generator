@@ -26,9 +26,11 @@ export default function App() {
   }
 
   return (
-    <Router>
+    <Router style={{position:'relative'}}>
       <Navbar />
-      <Alert alert={alert}/>
+      <div style={{ position: 'fixed', right: '2%' }}>
+       <Alert alert={alert} />
+       </div>
       <Routes>
        <Route exact path="/" element = {<Homepage showAlert={showAlert}/>} />
        <Route exact path="/addtenant" element = {<Tenant showAlert={showAlert}/>} />

@@ -12,7 +12,6 @@ export default function Amazon(props) {
     secretAccessKey: '',
     configurationSet: '',
     SNSTopicARN: '',
-    SuprSendSQS: '',
     price: ''
   });
   
@@ -25,9 +24,10 @@ export default function Amazon(props) {
   };
   
   const apisuprsend = process.env.REACT_APP_API;
+
+  console.log(formdata);
   const handleSubmit = async(event) => {
     event.preventDefault();
-    console.log('Form Data:', formdata);
     const response = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor/`,{
       method : "POST",
       headers:{
@@ -37,8 +37,8 @@ export default function Amazon(props) {
       body : JSON.stringify(
         {
           "nickname": formdata.nickname,
-          "root_categories": ["transactional"],
-          "cost_per_notif": formdata.price, 
+          "root_categories": ["transactional"], 
+          "cost_per_notif": 0.001, 
           "cost_currency": "USD",
           "vendor_slug": "amazon_ses-email",
           "vendor_config": {
@@ -48,9 +48,9 @@ export default function Amazon(props) {
                 "secret_access_key": formdata.secretAccessKey,
                 "aws_region": formdata.AWSRegion,
               },
-            "from_name": formdata.fromName,
-            "from_address": formdata.from_address,
-            "reply_address": formdata.reply_address,
+            "from_name": "",
+            "from_address": formdata.fromEmail,
+            "reply_address": "",
             "configuration_set": formdata.configurationSet,
             "sns_topic_arn": formdata. SNSTopicARN
             }
@@ -58,7 +58,47 @@ export default function Amazon(props) {
       )
     })
     const json = await response.json();
+    console.log(json);
+    if(json.code=="400"){
+      props.showAlert(json.message,"danger");
+    }
+    else{
+      const response1 = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor_routing/email/_/transactional/`,{
+        method : "POST",
+        headers:{
+          Authorization: `Bearer ${apisuprsend}`,
+          'Content-Type':"application/json",
+        },
+        body : JSON.stringify(
+          {
+            "routes": [
+              {
+                "fallbacks": [
+                  {
+                    "tenant_vendor_id": json.id 
+                  }
+                  ]
+              }
+              ]
+            }
+        )
+      })
+      const json1 = await response1.json();
+      const response2 = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor_routing/email/_/transactional/override/`,{
+        method : "POST",
+        headers:{
+          Authorization: `Bearer ${apisuprsend}`,
+          'Content-Type':"application/json",
+        },
+        body : JSON.stringify(
+          {
+            "override": true
+          }
+        )
+      })
+      const json2 = await response2.json();
     props.showAlert("AmazonSES vendor added to your Tenant succesfully","success");
+    }
   };
 
   return (
@@ -102,41 +142,39 @@ export default function Amazon(props) {
           />
         </div>
         <div className='form-group'>
-          <label htmlFor='fromName'>From Name</label>
-          <input
-            type='text'
-            id='fromName'
-            name='fromName'
-            className='form-control'
-            value={formdata.fromName}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='ReplyMail'>Reply Mail</label>
-          <input
-            type='email'
-            id='ReplyMail'
-            name='ReplyMail'
-            className='form-control'
-            value={formdata.ReplyMail}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='AWSRegion'>AWS Region</label>
-          <input
-            type='text'
-            id='AWSRegion'
-            name='AWSRegion'
-            className='form-control'
-            value={formdata.AWSRegion}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
+        <label htmlFor='AWSRegion'>AWS Region</label>
+        <select
+          id='AWSRegion'
+          name='AWSRegion'
+          className='form-control'
+          value={formdata.AWSRegion}
+          onChange={handleInputChange}
+          required
+        >
+          <option value='us-east-2'>US East (Ohio) - us-east-2</option>
+          <option value='us-east-1'>US East (N. Virginia) - us-east-1</option>
+          <option value='us-west-1'>US West (N. California) - us-west-1</option>
+          <option value='us-west-2'>US West (Oregon) - us-west-2</option>
+          <option value='af-south-1'>Africa (Cape Town) - af-south-1</option>
+          <option value='ap-south-1'>Asia Pacific (Mumbai) - ap-south-1</option>
+          <option value='ap-northeast-3'>Asia Pacific (Osaka) - ap-northeast-3</option>
+          <option value='ap-northeast-2'>Asia Pacific (Seoul) - ap-northeast-2</option>
+          <option value='ap-southeast-1'>Asia Pacific (Singapore) - ap-southeast-1</option>
+          <option value='ap-southeast-2'>Asia Pacific (Sydney) - ap-southeast-2</option>
+          <option value='ap-northeast-1'>Asia Pacific (Tokyo) - ap-northeast-1</option>
+          <option value='ca-central-1'>Canada (Central) - ca-central-1</option>
+          <option value='eu-central-1'>Europe (Frankfurt) - eu-central-1</option>
+          <option value='eu-west-1'>Europe (Ireland) - eu-west-1</option>
+          <option value='eu-west-2'>Europe (London) - eu-west-2</option>
+          <option value='eu-south-1'>Europe (Milan) - eu-south-1</option>
+          <option value='eu-west-3'>Europe (Paris) - eu-west-3</option>
+          <option value='eu-north-1'>Europe (Stockholm) - eu-north-1</option>
+          <option value='me-south-1'>Middle East (Bahrain) - me-south-1</option>
+          <option value='sa-east-1'>South America (São Paulo) - sa-east-1</option>
+
+        </select>
+</div>
+
         <div className='form-group'>
           <label htmlFor='accessKeyId'>Access Key ID</label>
           <input
@@ -181,31 +219,6 @@ export default function Amazon(props) {
             name='SNSTopicARN'
             className='form-control'
             value={formdata.SNSTopicARN}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='SuprSendSQS'>SuprSend SQS</label>
-          <input
-            type='text'
-            id='SuprSendSQS'
-            name='SuprSendSQS'
-            className='form-control'
-            value={formdata.SuprSendSQS}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='price'>Price</label>
-          <input
-            type='number'
-            id='price'
-            name='price'
-            step='0.001'
-            className='form-control'
-            value={formdata.price}
             onChange={handleInputChange}
             required
           />

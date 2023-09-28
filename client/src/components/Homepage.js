@@ -41,7 +41,7 @@ export default function Homepage(props) {
         amount: '',
         itemDescription: '',
         notes: '',
-        tenantid: '',
+        tenantid: 'SuprSend1',
       })
     };
     return (
@@ -123,7 +123,7 @@ export default function Homepage(props) {
                   name="notes"
                   value={invoiceData.notes}
                   onChange={handleInputChange}
-                  required
+                  placeholder='Optional Field'
                 />
               </Form.Group>
               <Form.Group className='mx-2 my-2'>

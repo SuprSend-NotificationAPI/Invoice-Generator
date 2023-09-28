@@ -54,7 +54,46 @@ export default function Mailgun(props) {
       )
     })
     const json = await response.json();
-    props.showAlert("Mailgun vendor added to your Tenant succesfully","success");
+    if(json.code=="400"){
+      props.showAlert(json.message,"danger");
+    }
+    else{
+      const response1 = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor_routing/email/_/transactional/`,{
+        method : "POST",
+        headers:{
+          Authorization: `Bearer ${apisuprsend}`,
+          'Content-Type':"application/json",
+        },
+        body : JSON.stringify(
+          {
+            "routes": [
+              {
+                "fallbacks": [
+                  {
+                    "tenant_vendor_id": json.id 
+                  }
+                  ]
+              }
+              ]
+            }
+        )
+      })
+      const json1 = await response1.json();
+      const response2 = await fetch(`https://hub.suprsend.com/v1/tenant/${formdata.tenant}/vendor_routing/email/_/transactional/override/`,{
+        method : "POST",
+        headers:{
+          Authorization: `Bearer ${apisuprsend}`,
+          'Content-Type':"application/json",
+        },
+        body : JSON.stringify(
+          {
+            "override": true
+          }
+        )
+      })
+      const json2 = await response2.json();
+      props.showAlert("Mailgun vendor added to your Tenant succesfully","success");
+    }
   };
 
   return (
@@ -109,7 +148,7 @@ export default function Mailgun(props) {
             required
           />
         </div>
-        <div className='form-group'>
+        {/* <div className='form-group'>
           <label htmlFor='DomainPrefix'>Domain Prefix</label>
           <input
             type='text'
@@ -120,20 +159,22 @@ export default function Mailgun(props) {
             onChange={handleInputChange}
             required
           />
-        </div>
+        </div> */}
         <div className='form-group'>
           <label htmlFor='DataCenterRegion'>Data Center Region</label>
-          <input
-            type='text'
+          <select
             id='DataCenterRegion'
             name='DataCenterRegion'
             className='form-control'
             value={formdata.DataCenterRegion}
             onChange={handleInputChange}
             required
-          />
+          >
+            <option value='eu'>Europe-region</option>
+            <option value='non_eu'>Outside-Europe</option>
+          </select>
         </div>
-        <div className='form-group'>
+        {/* <div className='form-group'>
           <label htmlFor='FromName'>From Name</label>
           <input
             type='text'
@@ -144,7 +185,7 @@ export default function Mailgun(props) {
             onChange={handleInputChange}
             required
           />
-        </div>
+        </div> */}
         <div className='form-group'>
           <label htmlFor='FromEmail'>From Email</label>
           <input
@@ -153,31 +194,6 @@ export default function Mailgun(props) {
             name='FromEmail'
             className='form-control'
             value={formdata.FromEmail}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='ReplyEmail'>Reply Email</label>
-          <input
-            type='email'
-            id='ReplyEmail'
-            name='ReplyEmail'
-            className='form-control'
-            value={formdata.ReplyEmail}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div className='form-group'>
-          <label htmlFor='price'>Price</label>
-          <input
-            type='number'
-            id='price'
-            name='price'
-            step='0.001'
-            className='form-control'
-            value={formdata.price}
             onChange={handleInputChange}
             required
           />
